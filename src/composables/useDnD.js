@@ -1,13 +1,11 @@
 import { useVueFlow } from '@vue-flow/core'
 import { ref, watch } from 'vue'
 
-let id = 0
-
 /**
  * @returns {string} - A unique id.
  */
 function getId() {
-  return `dndnode_${id++}`
+  return crypto.randomUUID().slice(0, 12)
 }
 
 /**

@@ -1,6 +1,6 @@
 <script setup>
-import { ref, onMounted } from 'vue'
-import { useGraphStore } from '../stores/graph'
+import { ref, onMounted, watch } from 'vue'
+import { useStore } from '../stores/store'
 import { VueFlow, useVueFlow } from '@vue-flow/core'
 import { ControlButton, Controls } from '@vue-flow/controls'
 import NodeMenu from './NodeMenu.vue'
@@ -9,47 +9,37 @@ import DropzoneBackground from './DropzoneBackground.vue'
 import Icon from './icons/IconSprite.vue'
 import useDragAndDrop from '../composables/useDnD'
 
-const graphStore = useGraphStore()
+const graphStore = useStore()
 
 const { onConnect, addEdges } = useVueFlow()
 const { onDragOver, onDrop, onDragLeave, isDragOver } = useDragAndDrop()
 
+const { onPaneReady } = useVueFlow()
+onPaneReady((instance) => instance.fitView())
+
 const selectedNode = ref(null)
-const nodes = ref([])
+const defaultEdgeOptions = {
+  animated: true,
+  type: 'smoothstep'
+}
 
 onConnect(addEdges)
 
-const addNode = (node) => {
-  graphStore.addElement(node)
-}
-
-const onNodeDragStart = (event) => {
-  console.log('Node drag started:', event)
-}
-
-const onNodeDragStop = (event) => {
-  console.log('Node drag stopped:', event)
-}
-
-const onConnectGraph = (params) => {
-  graphStore.addElement({
-    id: `edge-${params.source}-${params.target}`,
-    source: params.source,
-    target: params.target
-  })
-}
-
-const updateNode = (node) => {
-  graphStore.updateElement(node)
-  selectedNode.value = null
-}
-
 function toggleDarkMode() {
-  graphStore.dark = !graphStore.dark
+  graphStore.toggleClass()
 }
+
+watch(
+  graphStore,
+  () => {
+    graphStore.saveGraph()
+  },
+  { deep: true }
+)
 
 onMounted(() => {
   graphStore.loadGraph()
+  graphStore.loadTheme()
 })
 </script>
 
@@ -59,14 +49,12 @@ onMounted(() => {
     <VueFlow
       :class="{ dark: graphStore.dark }"
       class="basic-flow"
-      :nodes="nodes"
+      v-model:nodes="graphStore.nodes"
+      v-model:edges="graphStore.edges"
+      :defaultEdgeOptions="defaultEdgeOptions"
       @dragover="onDragOver"
       @dragleave="onDragLeave">
-      <DropzoneBackground
-        :style="{
-          backgroundColor: isDragOver ? '#e7f3ff' : 'transparent',
-          transition: 'background-color 0.2s ease'
-        }">
+      <DropzoneBackground>
         <p v-if="isDragOver">Drop here</p>
       </DropzoneBackground>
       <Controls position="top-left">
@@ -77,7 +65,7 @@ onMounted(() => {
       </Controls>
     </VueFlow>
 
-    <NodeModal v-if="selectedNode" :node="selectedNode" @save="updateNode" />
+    <NodeModal v-if="selectedNode" :node="selectedNode" />
   </div>
 </template>
 

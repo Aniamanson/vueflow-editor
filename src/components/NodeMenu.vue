@@ -1,14 +1,23 @@
 <script setup>
+import { useStore } from '../stores/store'
 import useDragAndDrop from '../composables/useDnD'
 import { reactive } from 'vue'
 
-const emit = defineEmits(['addNode'])
+const graphStore = useStore()
 
 const { onDragStart } = useDragAndDrop()
 const nodesType = reactive({
-  start: 'Start Node',
-  state: 'State Node',
-  sms: 'Send SMS Node'
+  start: {
+    name: 'Start Node',
+    type: 'input'
+  },
+  state: {
+    name: 'State Node'
+  },
+  sms: {
+    name: 'Send SMS Node',
+    type: 'output'
+  }
 })
 
 const selectNode = (type) => {
@@ -18,7 +27,7 @@ const selectNode = (type) => {
     position: { x: 100, y: 100 },
     data: { label: type.charAt(0).toUpperCase() + type.slice(1) }
   }
-  emit('addNode', node)
+  graphStore.addElement(node)
 }
 </script>
 
@@ -30,9 +39,9 @@ const selectNode = (type) => {
       <div
         class="vue-flow__node-input"
         :draggable="true"
-        @dragstart="onDragStart($event, node, key)"
+        @dragstart="onDragStart($event, node.name, node.type)"
         @dblclick="selectNode(key)">
-        {{ node }}
+        {{ node.name }}
       </div>
     </div>
   </aside>
