@@ -1,9 +1,12 @@
 <script setup>
 import GraphEditor from './components/GraphEditor.vue'
+import { useStore } from '@/stores/store.js'
+
+const graphStore = useStore()
 </script>
 
 <template>
-  <main>
+  <main :class="{ dark: graphStore.dark }">
     <GraphEditor />
   </main>
 </template>
@@ -50,43 +53,20 @@ main {
   flex-direction: column;
   display: flex;
   height: 100%;
-}
 
-.dnd-flow aside {
-  color: #fff;
-  font-weight: 700;
-  border-right: 1px solid #eee;
-  padding: 15px 10px;
-  font-size: 12px;
-  -webkit-box-shadow: 0px 5px 10px 0px rgba(0, 0, 0, 0.3);
-  box-shadow: 0 5px 10px #0000004d;
-  background: rgb(114 244 255 / 75%);
-}
-
-.dnd-flow aside .nodes > * {
-  margin-bottom: 10px;
-  cursor: grab;
-  font-weight: 500;
-  -webkit-box-shadow: 5px 5px 10px 2px rgba(0, 0, 0, 0.25);
-  box-shadow: 5px 5px 10px 2px #00000040;
-}
-
-.dnd-flow aside .description {
-  margin-bottom: 10px;
-}
-
-.dnd-flow .vue-flow-wrapper {
-  flex-grow: 1;
-  height: 100%;
+  .vue-flow-wrapper {
+    flex-grow: 1;
+    height: 100%;
+  }
 }
 
 @media screen and (min-width: 640px) {
   .dnd-flow {
     flex-direction: row;
-  }
 
-  .dnd-flow aside {
-    min-width: 25%;
+    aside {
+      min-width: 25%;
+    }
   }
 }
 
@@ -102,39 +82,24 @@ main {
   position: relative;
   height: 100%;
   width: 100%;
-}
 
-.dropzone-background .overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  height: 100%;
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1;
-  pointer-events: none;
+  .overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1;
+    pointer-events: none;
+  }
 }
 
 .basic-flow {
   background: #fff;
   color: #222;
-
-  &.dark {
-    background: #2d3748;
-    color: #fffffb;
-
-    .vue-flow__node {
-      background: #4a5568;
-      color: #fffffb;
-    }
-  }
-}
-
-.basic-flow.dark .vue-flow__node.selected {
-  background: #333;
-  box-shadow: 0 0 0 2px #2563eb;
 }
 
 .basic-flow .vue-flow__controls {
@@ -152,13 +117,38 @@ main {
   border-right: 1px solid #eee;
 }
 
-.basic-flow.dark .vue-flow__controls .vue-flow__controls-button {
-  background: #333;
-  fill: #fffffb;
-  border: none;
-}
+.dark {
+  .dnd-flow aside {
+    background: #2c2a43;
 
-.basic-flow.dark .vue-flow__controls .vue-flow__controls-button:hover {
-  background: #4d4d4d;
+    .vue-flow__node-input {
+      background: #4a5568;
+      color: #fffffb;
+    }
+  }
+  .basic-flow {
+    background: #2d3748;
+    color: #fffffb;
+
+    .vue-flow__node {
+      background: #4a5568;
+      color: #fffffb;
+
+      &.selected {
+        background: #333;
+        box-shadow: 0 0 0 2px #2563eb;
+      }
+    }
+
+    .vue-flow__controls .vue-flow__controls-button {
+      background: #333;
+      fill: #fffffb;
+      border: none;
+
+      &:hover {
+        background: #4d4d4d;
+      }
+    }
+  }
 }
 </style>
